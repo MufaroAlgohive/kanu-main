@@ -1,40 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { useEmployees, type Employee, type Experience, type Compensation } from "@/context/EmployeeContext";
 
 const ACCENT = "#0f766e";
-
-type Experience = {
-  company: string;
-  role: string;
-  period: string;
-  duration: string;
-};
-
-type Compensation = {
-  basicSalary: string;
-  total_ctc: string;
-  grade: string;
-  band: string;
-};
-
-type Employee = {
-  id: number;
-  name: string;
-  initials: string;
-  title: string;
-  department: string;
-  grade: string;
-  location: string;
-  status: string;
-  employeeId: string;
-  reportingTo: string;
-  startDate: string;
-  qualifications: string;
-  skills: string[];
-  responsibilities: string[];
-  experience: Experience[];
-  compensation: Compensation;
-  avatar_color?: string;
-};
 
 type EmployeeForm = {
   name: string;
@@ -50,6 +17,8 @@ type EmployeeForm = {
   qualifications: string;
   skills: string;
   responsibilities: string;
+  salaryAmount: number;
+  tenure: string;
   compensation: Compensation;
   experience: Experience[];
 };
@@ -59,7 +28,8 @@ type EditableEmployee = Omit<Employee, "skills" | "responsibilities"> & {
   responsibilities: string;
 };
 
-const initEmployees: Employee[] = [
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _unused_employees = [
   {
     id: 1,
     name: "Mpumelelo Maswanganye",
@@ -368,6 +338,8 @@ const emptyForm: EmployeeForm = {
   qualifications: "",
   skills: "",
   responsibilities: "",
+  salaryAmount: 0,
+  tenure: "",
   compensation: { ...emptyComp },
   experience: [{ company: "", role: "", period: "", duration: "" }],
 };
@@ -457,7 +429,7 @@ const SectionLabel = ({ children }: { children: string }) => (
 );
 
 export default function TalentProfiles() {
-  const [employees, setEmployees] = useState<Employee[]>(initEmployees);
+  const { employees, setEmployees } = useEmployees();
   const [selected, setSelected] = useState<Employee | null>(null);
   const [activeDept, setActiveDept] = useState("All");
   const [search, setSearch] = useState("");
@@ -559,6 +531,8 @@ export default function TalentProfiles() {
         .map((responsibility) => responsibility.trim())
         .filter(Boolean),
       experience: form.experience.filter((exp) => exp.company),
+      salaryAmount: form.salaryAmount,
+      tenure: form.tenure,
     };
 
     setEmployees((previous) => [...previous, newEmployee]);
@@ -991,6 +965,7 @@ export default function TalentProfiles() {
                 <FieldInput label="Grade" value={form.grade} onChange={(value) => setForm((previous) => ({ ...previous, grade: value }))} placeholder="e.g. G7" />
                 <FieldInput label="Reports To" value={form.reportingTo} onChange={(value) => setForm((previous) => ({ ...previous, reportingTo: value }))} placeholder="Manager name" />
                 <FieldInput label="Start Date" value={form.startDate} onChange={(value) => setForm((previous) => ({ ...previous, startDate: value }))} placeholder="e.g. March 2024" />
+                <FieldInput label="Tenure" value={form.tenure} onChange={(value) => setForm((previous) => ({ ...previous, tenure: value }))} placeholder="e.g. 2y 4m" />
               </div>
               <FieldInput label="Qualifications" value={form.qualifications} onChange={(value) => setForm((previous) => ({ ...previous, qualifications: value }))} placeholder="e.g. BSc Computer Science, UCT" />
 
@@ -1015,8 +990,22 @@ export default function TalentProfiles() {
               <TextareaField label="Key Responsibilities (one per line)" value={form.responsibilities} onChange={(value) => setForm((previous) => ({ ...previous, responsibilities: value }))} placeholder={"Lead team roadmap\nConduct stakeholder reviews\n…"} rows={5} />
 
               <SectionLabel>Compensation</SectionLabel>
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: "5px" }}>Monthly Salary (numeric) *</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.salaryAmount || ""}
+                  onChange={(e) => setForm((previous) => ({ ...previous, salaryAmount: Number(e.target.value) }))}
+                  placeholder="e.g. 38500"
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "13px", color: "#0f172a", outline: "none", background: "#f8fafc", boxSizing: "border-box" }}
+                  onFocus={(e) => { e.target.style.borderColor = ACCENT; }}
+                  onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; }}
+                />
+                <p style={{ margin: "4px 0 0", fontSize: "11px", color: "#94a3b8" }}>Used for benchmarking comparisons — enter the raw number (e.g. 38500)</p>
+              </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                <FieldInput label="Basic Salary" value={form.compensation.basicSalary} onChange={(value) => setForm((previous) => ({ ...previous, compensation: { ...previous.compensation, basicSalary: value } }))} placeholder="R 38 500/mo" />
+                <FieldInput label="Basic Salary (display)" value={form.compensation.basicSalary} onChange={(value) => setForm((previous) => ({ ...previous, compensation: { ...previous.compensation, basicSalary: value } }))} placeholder="R 38 500/mo" />
                 <FieldInput label="Total CTC" value={form.compensation.total_ctc} onChange={(value) => setForm((previous) => ({ ...previous, compensation: { ...previous.compensation, total_ctc: value } }))} placeholder="R 500 000 p/a" />
                 <FieldInput label="Grade Label" value={form.compensation.grade} onChange={(value) => setForm((previous) => ({ ...previous, compensation: { ...previous.compensation, grade: value } }))} placeholder="G7 – Senior" />
                 <FieldInput label="Band" value={form.compensation.band} onChange={(value) => setForm((previous) => ({ ...previous, compensation: { ...previous.compensation, band: value } }))} placeholder="Professional" />

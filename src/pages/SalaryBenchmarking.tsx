@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useEmployees } from "@/context/EmployeeContext";
 import {
   BarChart,
   Bar,
@@ -123,7 +124,26 @@ export default function SalaryBenchmarking() {
   const [activeRoleFilter, setActiveRoleFilter] = useState<string | null>(null);
   const [empView, setEmpView] = useState<"card" | "list">("list");
 
-  const filtered = roles.filter((r) => {
+  const { employees: profileEmployees } = useEmployees();
+
+  const enrichedRoles = useMemo(() => {
+    return roles.map((role) => {
+      const matching = profileEmployees
+        .filter((emp) => emp.title === role.title && emp.salaryAmount > 0)
+        .map((emp) => ({
+          name: emp.name,
+          salary: emp.salaryAmount,
+          tenure: emp.tenure || emp.startDate,
+          location: emp.location,
+          status: emp.status as "Active" | "On Leave" | "Contract",
+        }));
+      const existingNames = new Set(role.employees.map((e) => e.name));
+      const newEmployees = matching.filter((e) => !existingNames.has(e.name));
+      return { ...role, employees: [...role.employees, ...newEmployees] };
+    });
+  }, [profileEmployees]);
+
+  const filtered = enrichedRoles.filter((r) => {
     if (dept !== "All Departments" && r.dept !== dept) return false;
     if (level !== "All Levels" && r.level !== level) return false;
     if (search && !r.title.toLowerCase().includes(search.toLowerCase())) return false;
@@ -143,7 +163,7 @@ export default function SalaryBenchmarking() {
   }));
 
   const activeRoleData = activeRoleFilter
-    ? roles.find((r) => r.title === activeRoleFilter)
+    ? enrichedRoles.find((r) => r.title === activeRoleFilter)
     : null;
 
   const displayRole = activeRoleData ?? selectedRole;
