@@ -210,6 +210,25 @@ export default function SalaryBenchmarking() {
               />
             </div>
 
+            <Select
+              value={activeRoleFilter ?? "All Roles"}
+              onValueChange={(val) => setActiveRoleFilter(val === "All Roles" ? null : val)}
+            >
+              <SelectTrigger className="w-48 h-9 bg-muted/50 border-border text-sm">
+                <SelectValue placeholder="All Roles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All Roles">All Roles</SelectItem>
+                {[...filtered]
+                  .sort((a, b) => a.title.localeCompare(b.title))
+                  .map((role) => (
+                    <SelectItem key={role.title} value={role.title}>
+                      {role.title}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+
             <Select value={dept} onValueChange={setDept}>
               <SelectTrigger className="w-44 h-9 bg-muted/50 border-border text-sm">
                 <SelectValue />
@@ -233,29 +252,6 @@ export default function SalaryBenchmarking() {
                     {l}
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Role filter dropdown */}
-          <div className="flex items-center gap-2">
-            <Users size={14} className="text-muted-foreground shrink-0" />
-            <Select
-              value={activeRoleFilter ?? "All Roles"}
-              onValueChange={(val) => setActiveRoleFilter(val === "All Roles" ? null : val)}
-            >
-              <SelectTrigger className="flex-1 h-9 bg-muted/50 border-border text-sm">
-                <SelectValue placeholder="Filter by role…" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All Roles">All Roles</SelectItem>
-                {[...filtered]
-                  .sort((a, b) => a.title.localeCompare(b.title))
-                  .map((role) => (
-                    <SelectItem key={role.title} value={role.title}>
-                      {role.title}
-                    </SelectItem>
-                  ))}
               </SelectContent>
             </Select>
           </div>
