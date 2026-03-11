@@ -7,6 +7,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
+  LabelList,
+  ReferenceLine,
 } from "recharts";
 import {
   Search,
@@ -512,72 +515,162 @@ export default function SalaryBenchmarking() {
       </div>
 
       {/* Role detail panel */}
-      {selectedRole && (
-        <div className="bg-card rounded-xl border border-border p-5 shadow-card animate-fade-in">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="font-bold text-foreground text-lg">{selectedRole.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                {selectedRole.dept} · {selectedRole.level} · {selectedRole.headcount} employees
-              </p>
-            </div>
-            {(() => {
-              const pos = getMarketPosition(
-                selectedRole.internal,
-                selectedRole.p25,
-                selectedRole.p50,
-                selectedRole.p75
-              );
-              const PosIcon = positionIconMap[pos.icon as keyof typeof positionIconMap];
-              return (
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${pos.color}`}>
-                  <PosIcon size={12} />
-                  {pos.label}
-                </span>
-              );
-            })()}
-          </div>
+      {selectedRole && (() => {
+        const pos = getMarketPosition(
+          selectedRole.internal,
+          selectedRole.p25,
+          selectedRole.p50,
+          selectedRole.p75
+        );
+        const PosIcon = positionIconMap[pos.icon as keyof typeof positionIconMap];
+        const gapData = [
+          { label: "vs P25", gap: selectedRole.internal - selectedRole.p25 },
+          { label: "vs P50", gap: selectedRole.internal - selectedRole.p50 },
+          { label: "vs P75", gap: selectedRole.internal - selectedRole.p75 },
+        ];
+        const maxAbs = Math.max(...gapData.map((d) => Math.abs(d.gap)));
+        const yDomain = [-Math.ceil(maxAbs * 1.3), Math.ceil(maxAbs * 1.3)];
 
-          {/* Salary band visual */}
-          <div className="relative h-10 bg-muted rounded-xl overflow-hidden mb-3">
-            <div className="absolute inset-0 flex">
-              <div className="flex-1 bg-rose/20" />
-              <div className="flex-1 bg-amber/20" />
-              <div className="flex-1 bg-teal/20" />
-              <div className="flex-1 bg-green/20" />
-            </div>
-            <div className="absolute inset-0 flex items-center px-3 justify-between text-[10px] font-medium text-muted-foreground">
-              <span>P25: R {selectedRole.p25.toLocaleString()}</span>
-              <span>P50: R {selectedRole.p50.toLocaleString()}</span>
-              <span>P75: R {selectedRole.p75.toLocaleString()}</span>
-            </div>
-          </div>
-
-          {/* Key metrics grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { label: "Internal Salary", val: `R ${selectedRole.internal.toLocaleString()}`, bold: true },
-              { label: "Market P50", val: `R ${selectedRole.p50.toLocaleString()}` },
-              {
-                label: "Compa-Ratio",
-                val: `${getCompaRatio(selectedRole.internal, selectedRole.p50)}%`,
-                bold: true,
-              },
-              {
-                label: "Gap to P50",
-                val: `R ${(selectedRole.p50 - selectedRole.internal).toLocaleString()}`,
-              },
-            ].map(({ label, val, bold }) => (
-              <div key={label} className="bg-muted/50 rounded-lg p-3">
-                <p className="text-[11px] text-muted-foreground">{label}</p>
-                <p className={`text-base mt-0.5 ${bold ? "font-bold text-foreground" : "font-medium text-foreground"}`}>
-                  {val}
+        return (
+          <div className="bg-card rounded-xl border border-border p-5 shadow-card animate-fade-in">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-5">
+              <div>
+                <h3 className="font-bold text-foreground text-lg">{selectedRole.title}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {selectedRole.dept} · {selectedRole.level} · {selectedRole.headcount} employees
                 </p>
               </div>
-            ))}
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${pos.color}`}>
+                <PosIcon size={12} />
+                {pos.label}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Gap bar chart */}
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+                  Internal vs Market Gap
+                </p>
+                <p className="text-[11px] text-muted-foreground mb-3">
+                  Positive = above percentile · Negative = below percentile
+                </p>
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart
+                    data={gapData}
+                    margin={{ top: 24, right: 12, bottom: 4, left: 8 }}
+                    barSize={48}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(218,20%,91%)" vertical={false} />
+                    <XAxis
+                      dataKey="label"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fontWeight: 600 }}
+                    />
+                    <YAxis
+                      domain={yDomain}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10 }}
+                      tickFormatter={(v) => `R${(v / 1000).toFixed(0)}k`}
+                      width={48}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "hsl(218,20%,96%)" }}
+                      formatter={(value: number) => [
+                        `${value >= 0 ? "+" : ""}R ${Math.abs(value).toLocaleString()}`,
+                        "Gap",
+                      ]}
+                    />
+                    <ReferenceLine y={0} stroke="hsl(218,20%,75%)" strokeWidth={1.5} />
+                    <Bar dataKey="gap" radius={[6, 6, 0, 0]}>
+                      <LabelList
+                        dataKey="gap"
+                        position="top"
+                        formatter={(v: number) =>
+                          `${v >= 0 ? "+" : ""}R ${(Math.abs(v) / 1000).toFixed(1)}k`
+                        }
+                        style={{ fontSize: 11, fontWeight: 700, fill: "hsl(222,30%,30%)" }}
+                      />
+                      {gapData.map((entry) => (
+                        <Cell
+                          key={entry.label}
+                          fill={
+                            entry.gap >= 0
+                              ? "hsl(171,76%,34%)"
+                              : "hsl(350,72%,54%)"
+                          }
+                          fillOpacity={0.85}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+
+                {/* Legend */}
+                <div className="flex gap-4 mt-2 justify-center text-[11px] text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-sm inline-block bg-teal" />
+                    Above percentile
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-sm inline-block bg-rose" />
+                    Below percentile
+                  </span>
+                </div>
+              </div>
+
+              {/* Metric cards */}
+              <div className="flex flex-col gap-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Key Figures
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Internal Salary", val: `R ${selectedRole.internal.toLocaleString()}`, bold: true },
+                    { label: "Market P50", val: `R ${selectedRole.p50.toLocaleString()}` },
+                    {
+                      label: "Compa-Ratio",
+                      val: `${getCompaRatio(selectedRole.internal, selectedRole.p50)}%`,
+                      bold: true,
+                    },
+                    {
+                      label: "Gap to P50",
+                      val: `${selectedRole.internal >= selectedRole.p50 ? "+" : "-"}R ${Math.abs(selectedRole.p50 - selectedRole.internal).toLocaleString()}`,
+                    },
+                  ].map(({ label, val, bold }) => (
+                    <div key={label} className="bg-muted/50 rounded-xl p-4">
+                      <p className="text-[11px] text-muted-foreground">{label}</p>
+                      <p className={`text-base mt-1 ${bold ? "font-bold text-foreground" : "font-medium text-foreground"}`}>
+                        {val}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Market range bar */}
+                <div>
+                  <p className="text-[11px] text-muted-foreground mb-1.5">Market Range</p>
+                  <div className="relative h-9 bg-muted rounded-xl overflow-hidden">
+                    <div className="absolute inset-0 flex">
+                      <div className="flex-1" style={{ background: "hsl(171,55%,72%,0.35)" }} />
+                      <div className="flex-1" style={{ background: "hsl(171,62%,52%,0.35)" }} />
+                      <div className="flex-1" style={{ background: "hsl(171,76%,34%,0.35)" }} />
+                    </div>
+                    <div className="absolute inset-0 flex items-center px-3 justify-between text-[10px] font-semibold text-muted-foreground">
+                      <span>P25: R {selectedRole.p25.toLocaleString()}</span>
+                      <span>P50: R {selectedRole.p50.toLocaleString()}</span>
+                      <span>P75: R {selectedRole.p75.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
