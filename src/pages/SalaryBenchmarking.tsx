@@ -146,7 +146,12 @@ export default function SalaryBenchmarking() {
   const filtered = enrichedRoles.filter((r) => {
     if (dept !== "All Departments" && r.dept !== dept) return false;
     if (level !== "All Levels" && r.level !== level) return false;
-    if (search && !r.title.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const matchesTitle = r.title.toLowerCase().includes(q);
+      const matchesEmployee = r.employees.some((e) => e.name.toLowerCase().includes(q));
+      if (!matchesTitle && !matchesEmployee) return false;
+    }
     return true;
   });
 

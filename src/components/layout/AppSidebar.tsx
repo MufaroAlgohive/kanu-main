@@ -9,6 +9,7 @@ import {
   Settings,
   ChevronRight,
   PanelLeft,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,12 @@ const navItems = [
     url: "/profiles",
     icon: Users,
     description: "Individual profiling",
+  },
+  {
+    title: "Job Roles",
+    url: "/job-roles",
+    icon: Briefcase,
+    description: "Role management",
   },
 ];
 
