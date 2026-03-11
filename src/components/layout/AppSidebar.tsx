@@ -46,7 +46,7 @@ export default function AppSidebar() {
   return (
     <aside
       className={cn(
-        "flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300",
+        "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-300",
         collapsed ? "w-16" : "w-60"
       )}
     >

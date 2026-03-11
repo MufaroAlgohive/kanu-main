@@ -28,14 +28,14 @@ export default function AppLayout() {
   const meta = pageMeta[pathname] ?? { title: "CompIQ", subtitle: "" };
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
-      {/* Sidebar */}
+    <div className="h-screen flex w-full overflow-hidden bg-background">
+      {/* Sidebar — fixed height, never scrolls */}
       <AppSidebar />
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main content area — takes remaining width and scrolls internally */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top header */}
-        <header className="sticky top-0 z-40 h-16 flex items-center justify-between gap-4 border-b border-border bg-card/90 backdrop-blur-sm px-6">
+        <header className="shrink-0 z-40 h-16 flex items-center justify-between gap-4 border-b border-border bg-card/90 backdrop-blur-sm px-6">
           {/* Page title */}
           <div className="hidden sm:block">
             <h1 className="text-base font-bold text-foreground leading-tight">
@@ -80,8 +80,8 @@ export default function AppLayout() {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-6 animate-fade-in">
+        {/* Page content — this area scrolls */}
+        <main className="flex-1 overflow-y-auto p-6 animate-fade-in">
           <Outlet />
         </main>
       </div>
