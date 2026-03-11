@@ -60,7 +60,7 @@ export default function AppSidebar() {
             {/* Creates grooved, straight distortions resembling a coarse truck tire tread with water ripples */}
             <feTurbulence type="turbulence" baseFrequency="0.1 0.005" numOctaves="1" seed="2" result="tireGrooves" />
             
-            {/* Displace the Damascus steel pattern with the coarse grooves for a complex industrial texture */}
+
             <feDisplacementMap in="foldedSteel" in2="tireGrooves" scale="25" xChannelSelector="R" yChannelSelector="G" />
           </filter>
           <rect width="100%" height="100%" filter="url(#industrialDamascus)" fill="transparent" />
@@ -74,7 +74,7 @@ export default function AppSidebar() {
           collapsed ? "h-8 w-8" : "h-14 w-full" 
         )}>
           <img 
-            src="/assets/Logo.png" 
+            src="public/assets/Logo.png" 
             alt="Logo" 
             className={cn(
               "h-full object-contain",
