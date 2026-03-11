@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import leftPanelImage from "../../dist/assets/Gemini_Generated_Image_j9ll4yj9ll4yj9ll (1).png";
 
 type ViewMode = "login" | "signup";
 
@@ -90,9 +89,7 @@ export default function Auth() {
           borderRadius: "20px",
           overflow: "hidden",
           position: "relative",
-          backgroundImage: `url(${leftPanelImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2027 100%)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
