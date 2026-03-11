@@ -320,7 +320,7 @@ export default function SalaryBenchmarking() {
                             ? "text-green"
                             : parseFloat(ratio) < 90
                             ? "text-rose"
-                            : "text-amber"
+                            : "text-teal"
                         }`}
                       >
                         {ratio}%
@@ -637,7 +637,7 @@ export default function SalaryBenchmarking() {
                       highlight: true,
                       accent:
                         parseFloat(ratio) >= 100 ? "text-green" :
-                        parseFloat(ratio) < 90   ? "text-rose"  : "text-amber",
+                        parseFloat(ratio) < 90   ? "text-rose"  : "text-teal",
                     },
                     {
                       label: "Gap to P50",

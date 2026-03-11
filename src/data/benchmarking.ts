@@ -388,7 +388,7 @@ export function getMarketPosition(
   p75: number
 ): MarketPosition {
   if (internal < p25) return { label: "Below P25", color: "bg-rose-faint text-rose", icon: "TrendingDown" };
-  if (internal < p50) return { label: "P25–P50", color: "bg-amber-faint text-amber", icon: "Minus" };
+  if (internal < p50) return { label: "P25–P50", color: "bg-teal-faint text-teal", icon: "Minus" };
   if (internal < p75) return { label: "P50–P75", color: "bg-teal-faint text-teal", icon: "TrendingUp" };
   return { label: "Above P75", color: "bg-green-faint text-green", icon: "TrendingUp" };
 }
