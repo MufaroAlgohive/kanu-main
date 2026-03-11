@@ -962,7 +962,7 @@ export default function TalentProfiles() {
                   <FieldInput label="Job Title *" value={form.title} onChange={(value) => setForm((previous) => ({ ...previous, title: value }))} placeholder="e.g. Senior Software Engineer" />
                 </div>
                 <SelectField label="Department" value={form.department} onChange={(value) => setForm((previous) => ({ ...previous, department: value }))} options={["Technology", "Human Resources", "Product", "Finance"]} />
-                <FieldInput label="Grade" value={form.grade} onChange={(value) => setForm((previous) => ({ ...previous, grade: value }))} placeholder="e.g. G7" />
+                <FieldInput label="Grade" value={form.grade} onChange={(value) => setForm((previous) => ({ ...previous, grade: value }))} placeholder="e.g. Grade A" />
                 <FieldInput label="Reports To" value={form.reportingTo} onChange={(value) => setForm((previous) => ({ ...previous, reportingTo: value }))} placeholder="Manager name" />
                 <FieldInput label="Start Date" value={form.startDate} onChange={(value) => setForm((previous) => ({ ...previous, startDate: value }))} placeholder="e.g. March 2024" />
                 <FieldInput label="Tenure" value={form.tenure} onChange={(value) => setForm((previous) => ({ ...previous, tenure: value }))} placeholder="e.g. 2y 4m" />
