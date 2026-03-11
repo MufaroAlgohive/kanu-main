@@ -81,7 +81,7 @@ export default function AppSidebar() {
           collapsed ? "h-8 w-8" : "h-14 w-full" 
         )}>
           <img 
-            src="public/assets/Logo.png" 
+            src="/assets/Logo.png" 
             alt="Logo" 
             className={cn(
               "h-full object-contain",
