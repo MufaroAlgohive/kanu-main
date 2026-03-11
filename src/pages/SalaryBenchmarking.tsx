@@ -61,20 +61,24 @@ type TooltipProps = {
 
 function BenchmarkingTooltip({ active, payload, label }: TooltipProps) {
   if (!active || !payload?.length) return null;
-  const keyLabels: Record<string, string> = {
-    internal: "Internal",
-    p25: "P25",
-    p50: "P50",
-    p75: "P75",
+  const keyMeta: Record<string, { label: string; color: string }> = {
+    p25:      { label: "P25",      color: "hsl(171,55%,38%)" },
+    p50:      { label: "P50",      color: "hsl(171,62%,30%)" },
+    p75:      { label: "P75",      color: "hsl(171,76%,22%)" },
+    internal: { label: "Internal", color: "hsl(222,60%,22%)" },
   };
   return (
-    <div className="bg-card border border-border rounded-xl p-3 shadow-lg text-xs space-y-1">
-      <p className="font-bold text-foreground">{label}</p>
-      {payload.map((entry) => (
-        <p key={entry.dataKey} style={{ color: entry.fill }}>
-          {keyLabels[entry.dataKey] ?? entry.dataKey}: R {entry.value?.toLocaleString()}
-        </p>
-      ))}
+    <div className="bg-white border border-border rounded-xl px-4 py-3 shadow-xl text-xs space-y-1.5 min-w-[160px]">
+      <p className="font-bold text-foreground text-[13px] mb-2">{label}</p>
+      {payload.map((entry) => {
+        const meta = keyMeta[entry.dataKey] ?? { label: entry.dataKey, color: "hsl(222,30%,20%)" };
+        return (
+          <p key={entry.dataKey} className="flex justify-between gap-4 font-medium" style={{ color: meta.color }}>
+            <span>{meta.label}</span>
+            <span>R {entry.value?.toLocaleString()}</span>
+          </p>
+        );
+      })}
     </div>
   );
 }
@@ -157,20 +161,22 @@ export default function SalaryBenchmarking() {
             ))}
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={240}>
+        <ResponsiveContainer width="100%" height={320}>
           <BarChart
             data={chartData}
-            margin={{ top: 4, right: 4, bottom: 24, left: 0 }}
+            margin={{ top: 4, right: 4, bottom: 72, left: 0 }}
             barGap={2}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(218,20%,91%)" vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: 11, fill: "hsl(222,30%,30%)", fontWeight: 500 }}
               axisLine={false}
               tickLine={false}
-              angle={-25}
+              angle={-40}
               textAnchor="end"
+              interval={0}
+              height={72}
             />
             <YAxis
               tick={{ fontSize: 11 }}
